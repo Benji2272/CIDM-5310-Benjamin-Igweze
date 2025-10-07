@@ -1,164 +1,112 @@
-# KK&CAKES – Detailed Diagram Walkthrough (Order Flow)
+# 🎂 KK&Cakes Reminder System – Detailed Diagram Review
 
-This guide explains, step-by-step, how a customer places an order on the **KK&CAKES** website.  
-It ties together the four diagram types—**Flowchart**, **Sequence**, **Class**, and **ER**—so readers see *what* happens, *who* does it, and *where* it’s stored.
+The **KK&Cakes Reminder System** is a smart digital feature that allows customers to receive friendly reminders to order cakes before their special events — birthdays, anniversaries, weddings, and graduations.  
+It uses automated scheduling, personalized messages, and a smooth order process to strengthen customer engagement and boost sales.
 
----
-
-## Diagram Map (what each one is for)
-
-| Diagram | Purpose | What to look for |
-|---|---|---|
-| **Flowchart** | High-level **user journey** and decisions | Browse → Cart → Login → Delivery/Pickup → Payment → Confirmation; branches for coupon, out-of-stock, payment failure |
-| **Sequence** | **Service interactions** over time | Frontend ↔ Catalog/Cart/Auth/Inventory/Payment/Order/Shipping/Messaging; **reserve → commit** stock; **3-D Secure** |
-| **Class** | **Domain model** (objects used by code) | User, Address, Product/Variant, Cart/CartItem, Coupon, Order/OrderItem, Payment, Shipment |
-| **ER** | **Database schema** (tables & FKs) | Users/Addresses, Catalog (Categories/Products/Variants), Inventory, Cart/CartItems, Orders/OrderItems, Payments, Shipments, Coupons; ship-to/bill-to |
+This documentation provides a **detailed explanation** of the four key diagrams that define the design, structure, and flow of the KK&Cakes system:  
+**Flowchart, Sequence Diagram, Class Diagram, and ER Diagram.**
 
 ---
 
-## 1) Flowchart — User Journey (Step-by-Step)
+## 🧩 1. Flowchart – System Workflow
 
-**Goal:** Show the **decisions** and **happy/error** paths end-to-end.
+### 📜 Description
+The **flowchart** represents the entire process flow of the reminder system from start to finish.  
+It begins when a customer signs up or logs in, enters event details, and ends with the system sending reminders and confirming new orders.  
+This visual helps both technical and non-technical users understand the **logical steps** in the system’s operation.
 
-1. **Open Website** – Home/categories/search appear (entry point).
-2. **Browse & View Product** – User opens details to see options, price, images, reviews.
-3. **Choose Options & Add to Cart** – Size/flavor/qty selected; cart totals update.
-4. **Open Cart & Review** – See items, quantities, subtotal, delivery estimate.
-5. **Edit Cart?**  
-   - **Yes:** Adjust qty/remove → totals refresh → back to cart.  
-   - **No:** Continue.
-6. **Coupon?**  
-   - **Yes:** Validate code (date/usage/applicability).  
-     - **Valid:** Discount applied → continue.  
-     - **Invalid:** Stay in cart to fix.  
-   - **No:** Continue.
-7. **Proceed to Checkout** – System rechecks price/availability for freshness.
-8. **Logged In?**  
-   - **No:** Login or create account; retry on failure.  
-   - **Yes:** Continue.
-9. **Fulfillment: Delivery or Pickup**  
-   - **Delivery:** Enter/select address + delivery window.  
-   - **Pickup:** Choose store + time window.
-10. **Stock Check & Reservation** – System verifies items and **temporarily reserves** stock (TTL).  
-    - **OOS/lead time:** Show message → return to cart to adjust.
-11. **Payment Method** – Choose card/wallet/(optional) cash on delivery.
-12. **Payment Intent & 3-D Secure** – Create intent; bank challenge if required.
-13. **Payment Outcome**  
-    - **Failed:** Release reservation; user retries/changes method.  
-    - **Succeeded:** **Commit reservation**, **create order**.
-14. **Post-Purchase** – Schedule delivery/pickup, send **email/SMS**, show **Thank-You** page with order # and tracking.
+### 🧠 Key Points
+- **Start to End Visualization:** Displays every major step, from registration to order confirmation.  
+- **Decision Logic:** Includes a conditional check for upcoming events within 3–5 days.  
+- **Automation Emphasis:** Shows how the system automatically triggers reminders without manual action.  
+- **Customer Journey:** Demonstrates how the customer receives reminders and places an order directly through the app or website.
 
-> **Key idea:** *Reserve then commit* prevents overselling during payment.
+### 🎯 Purpose
+To provide a **clear, top-level overview** of how the reminder process works — making it easier to communicate the logic flow to developers, managers, and stakeholders.
 
 ---
 
-## 2) Sequence — Service-to-Service Calls (Step-by-Step)
+## 🔄 2. Sequence Diagram – System Interaction Flow
 
-**Actors:** `Customer`, `Website(Frontend)`, `Catalog`, `Cart`, `Auth`, `Inventory`, `Payment`, `Order`, `Shipping`, `Email/SMS`.
+### 📜 Description
+The **sequence diagram** shows how different components of the system communicate over time.  
+It highlights how data moves between the **Customer**, **App**, **Database**, **Scheduler**, and **Notification Service** in a step-by-step order.
 
-1. **Browse Products** – `Website → Catalog` list products (price/stock).
-2. **View Details** – `Website → Catalog` fetch product (options/images/stock).
-3. **Add to Cart** – `Website → Cart` add item; get updated totals.
-4. **Open Cart / Apply Coupon** – `Website ↔ Cart` get cart/apply coupon.
-5. **Authenticate if Needed** – `Website → Auth` login/signup; receive session/JWT.
-6. **Fulfillment Choice** – Website collects delivery address+window or pickup store+time.
-7. **Reserve Inventory** – `Website → Inventory` reserve; receive **reservation token (TTL)**.
-8. **Payment** – `Website → Payment` create intent; confirm/capture (3DS if needed).
-9. **Handle Result**  
-   - **Fail:** `Website → Inventory` release reservation; prompt retry.  
-   - **Success:**  
-     - `Website → Order` create order (cart, address/pickup, paymentId, reservationToken)  
-     - `Order → Inventory` **commit** reservation  
-     - `Order → Shipping` create shipment/pickup task (tracking/slot)  
-     - `Order → Email/SMS` send confirmation
-10. **Thank-You** – `Website → Customer` show order #, ETA, tracking link.
+### 🧠 Key Points
+- **User Interaction:** Begins with a customer adding an event date.  
+- **Database Operations:** The app stores this information securely in the database.  
+- **Automation:** A scheduler runs daily to check if any event is due soon.  
+- **Notifications:** Personalized reminders are sent via email, SMS, or in-app alerts.  
+- **Order Conversion:** When the customer clicks the reminder link, an order is automatically created and confirmed.
+
+### 🎯 Purpose
+To illustrate the **real-time flow of actions and messages** within the system.  
+It helps developers and designers understand **how different components interact** and at what stage each process occurs.
 
 ---
 
-## 3) Class — Domain Objects Used in Code (Step-by-Step)
+## 🧱 3. Class Diagram – System Structure
 
-**Core classes:** `User`, `Address`, `Product`, `ProductVariant`, `InventoryItem`, `Cart`, `CartItem`, `Coupon`, `Order`, `OrderItem`, `Payment`, `Shipment`.
+### 📜 Description
+The **class diagram** represents the **object-oriented architecture** of the KK&Cakes system.  
+It defines all the main classes (or entities), their properties (attributes), and how they are related to one another.
 
-1. **Browsing** – `Product` (+ `ProductVariant`) populate UI with options & price.
-2. **Carting** – `Cart` aggregates `CartItem`s; `applyCoupon(code)` adjusts totals.
-3. **Auth** – `User` session established; default `Address` may be selected.
-4. **Fulfillment** – `Address` used for shipping (or pickup selection held).
-5. **Stock Hold** – `InventoryItem.reserve(qty)` during payment; `commit(qty)` on success; `release(qty)` on failure.
-6. **Payment** – `Payment` captures method/status/amount and timestamps.
-7. **Order Creation** – `Order` snapshots totals & addresses, links `OrderItem`s (unit price at purchase time).
-8. **Shipment** – `Shipment` stores carrier/tracking/schedule & status.
+### 🧠 Key Points
+- **Customer Class:** Contains user information like name, email, and preferred contact channel.  
+- **Event Class:** Stores event details such as name and date, connected to a specific customer.  
+- **Reminder Class:** Handles the scheduling and delivery of notifications tied to each event.  
+- **Order Class:** Records purchase details triggered by reminders or direct orders.  
+- **OrderItem and Product Classes:** Capture specific product details for each order, including quantities and pricing.
 
-> **Why snapshot prices in `OrderItem`?** Historical orders stay accurate even if catalog prices change later.
-
----
-
-## 4) ER — Database Changes Through One Purchase (Step-by-Step)
-
-**Tables touched:** `USERS`, `ADDRESSES`, `CATEGORIES`, `PRODUCTS`, `PRODUCT_VARIANTS`, `INVENTORY_ITEMS`, `CARTS`, `CART_ITEMS`, `COUPONS`, `ORDERS`, `ORDER_ITEMS`, `PAYMENTS`, `SHIPMENTS`.
-
-1. **Cart Build-Up** – `CARTS` (one active per user) and multiple `CART_ITEMS` (variant, qty, unit_price, line_total).  
-   Optional: `CARTS.coupon_id` set after coupon validation.
-2. **Pre-Checkout Validation** – Totals recalculated; price/options rechecked.
-3. **Reservation** – `INVENTORY_ITEMS.quantity_reserved` increments per SKU.
-4. **Payment Attempt** – Gateway state only; no DB rows yet; reservation held.
-5. **Payment Fail (branch)** – Release reservation (`quantity_reserved` decremented); user retries.
-6. **Payment Success (happy path)** – Create:  
-   - `ORDERS` (order_no, status=CONFIRMED, money totals, `ship_to_id`, `bill_to_id`)  
-   - `ORDER_ITEMS` (snapshot of cart: variant_id, qty, unit_price, line_total, sku)  
-   - `PAYMENTS` (txn_id, method, status, amount, paid_at; one per order in simple model)  
-   - `SHIPMENTS` (carrier, tracking_number, scheduled_for, status)  
-   Inventory: reserved qty moved to committed (reserved--, on_hand-- as per your policy).
-7. **Notifications** – Not modeled here; add `NOTIFICATIONS`/`AUDIT_LOGS` if needed.
+### 🎯 Purpose
+To define the **data structure** of the system in a logical, object-oriented manner.  
+It helps backend developers and database designers build a consistent and maintainable codebase by understanding how entities are **linked and interdependent**.
 
 ---
 
-## 5) Error & Edge Cases
+## 🗄️ 4. ER Diagram – Database Relationships
 
-- **Invalid coupon** – Flowchart: back to Cart; Sequence: `Cart.applyCoupon` invalid; DB unchanged.  
-- **Out of stock** – Flowchart: adjust cart; Sequence: `Inventory.reserve` fails; DB unchanged except transient reservation attempts.  
-- **Payment failure** – Flowchart: retry; Sequence: `Payment` fails; DB: reservation released, no order/payment rows created.  
-- **Address/pickup change** – Flowchart: reselect; Sequence: choice repeated; DB: only final addresses saved on `ORDERS`.
+### 📜 Description
+The **Entity Relationship Diagram (ERD)** provides a **database-level view** of how information is stored and connected in the KK&Cakes system.  
+It visualizes tables, columns, and relationships such as one-to-many and many-to-one connections.
 
----
+### 🧠 Key Points
+- **Customer–Event Relationship:** Each customer can have multiple events (e.g., birthday, anniversary).  
+- **Event–Reminder Relationship:** Each event can generate multiple reminders depending on scheduling.  
+- **Customer–Order Relationship:** A customer can place multiple orders, often linked to reminders.  
+- **Order–OrderItem–Product Relationship:** Orders contain specific items referencing the product catalog.  
+- **Referential Integrity:** Ensures all relationships maintain accurate and linked data between tables.
 
-## 6) Traceability (Action → Services → Classes → Tables)
+### 🖼️ Visual Representation
+If your Markdown viewer doesn’t render Mermaid, include the static PNG version:
 
-| User Action | Services (Sequence) | Classes (Code) | Tables (ER) |
-|---|---|---|---|
-| Add to cart | Website → Cart | `Cart`, `CartItem`, `ProductVariant` | `CARTS`, `CART_ITEMS` |
-| Apply coupon | Website → Cart | `Cart.applyCoupon`, `Coupon` | `CARTS` (`coupon_id`) |
-| Login | Website → Auth | `User` | — |
-| Choose delivery | — | `Address` | `ADDRESSES` (existing rows) |
-| Reserve stock | Website → Inventory | `InventoryItem.reserve` | `INVENTORY_ITEMS` (reserved++) |
-| Pay | Website → Payment | `Payment` (domain-side) | — (gateway state) |
-| Payment success | Website → Order | `Order`, `OrderItem`, `Payment`, `Shipment` | `ORDERS`, `ORDER_ITEMS`, `PAYMENTS`, `SHIPMENTS` |
-| Commit stock | Order → Inventory | `InventoryItem.commit` | `INVENTORY_ITEMS` (reserved--, on_hand--) |
+![KK&Cakes ER Diagram](A_diagram_in_the_form_of_a_digital_database_entity.png)
 
----
-
-## Assumptions (tweak as needed)
-
-- **One active cart per user** (guest carts optional).
-- **One payment** and **one shipment** per order (split flows can be modeled as 1..* later).
-- **One inventory row per SKU** (single-warehouse; add locations for multi-warehouse).
-- **One coupon per cart** (use a junction for stacking).
-
-**Common tweaks:**  
-- *Guest checkout:* make `CARTS.user_id` nullable; capture `guest_email`.  
-- *Split payments/shipments:* change to `ORDERS 1..* PAYMENTS` and `ORDERS 1..* SHIPMENTS`.  
-- *Multi-warehouse:* add `INVENTORY_LOCATIONS` + `INVENTORY_BALANCES`.  
-- *Custom cakes:* add `CUSTOM_ORDERS` linked `1:1` to `ORDER_ITEMS` for messages/designs.
+### 🎯 Purpose
+To describe the **relational structure of the database**, showing how data entities connect and ensuring smooth integration between frontend operations and backend storage.
 
 ---
 
-## How to Render the Diagrams (optional)
+## 📊 Summary Table
 
-- **Mermaid Live Editor**: paste each `.mmd` file to render.  
-- **Lucid**: *Insert → Code/Diagram → Mermaid* then paste.  
-- **CLI export** (PNG/PDF):
-  ```bash
-  npm i -g @mermaid-js/mermaid-cli
-  mmdc -i diagrams/flowchart.mmd -o exports/flowchart.png
-  mmdc -i diagrams/sequence.mmd  -o exports/sequence.png
-  mmdc -i diagrams/class.mmd     -o exports/class.png
-  mmdc -i diagrams/er.mmd        -o exports/er.png
+| Diagram Type | Main Focus | Key Insights | Purpose |
+|---------------|-------------|---------------|----------|
+| **Flowchart** | Overall process | Step-by-step workflow | Show how the reminder system operates |
+| **Sequence Diagram** | Interactions | Communication flow | Explain how system components exchange data |
+| **Class Diagram** | Structure | Object relationships | Define backend data model and entities |
+| **ER Diagram** | Database design | Table and key relations | Represent how data is organized and stored |
+
+---
+
+## 🚀 Key Takeaways
+- These four diagrams together create a **complete picture** of the KK&Cakes reminder system — from **concept to implementation**.  
+- The Flowchart and Sequence Diagram focus on **behavior and flow**, while the Class Diagram and ER Diagram focus on **data and structure**.  
+- Together, they support better **system planning**, **communication**, and **maintenance** as the business scales.
+
+---
+
+## 🧑‍💻 Author & Credits
+**Created for:** KK&Cakes 🍰  
+**Purpose:** Customer Engagement & Smart Reminder System  
+**Author:** [Your Name or GitHub Handle]  
+**Date:** 2025  
