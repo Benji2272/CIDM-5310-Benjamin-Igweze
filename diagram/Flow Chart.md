@@ -1,61 +1,25 @@
 flowchart TD
-  %% ===== PHASE 1: BROWSING =====
-  A[Open KK&CAKES Website] --> B[Browse Categories / Search]
-  B --> C[View Product Details]
-  C --> D{Choose Options: Size, Flavor, Icing, Qty}
-  D -->|Add to Cart| E[Cart Updated]
+    A[Start] --> B[Customer Registers or Logs In]
+    B --> C[Customer Adds Event Dates<br>(Birthday, Anniversary, etc.)]
+    C --> D[Save Event Details to Database]
+    D --> E[System Scheduler Runs Daily<br>(Cron Job)]
+    E --> F{Any Upcoming Events<br>in 3-5 Days?}
+    F -->|Yes| G[Fetch Customer Details<br>& Event Info]
+    F -->|No| O[No Action Needed]
+    G --> H[Generate Personalized<br>Reminder Message]
+    H --> I[Send Notification<br>(Email, SMS, or App)]
+    I --> J[Include Order Link<br>or Discount Code]
+    J --> K[Customer Clicks & Places Order]
+    K --> L[Order Confirmation Sent]
+    L --> M[Record Customer Response Analytics]
+    M --> N[End]
+    O --> N
 
-  %% ===== PHASE 2: CART & CHECKOUT =====
-  E --> F[Open Cart]
-  F --> G{Edit Cart?}
-  G -->|Yes| H[Update qty/remove items] --> F
-  G -->|No| I{Have Coupon Code?}
-  I -->|Yes| J[Apply Coupon / Validate] --> K{Coupon Valid?}
-  I -->|No| L[Proceed to Checkout]
-  K -->|No| F
-  K -->|Yes| L[Proceed to Checkout]
-
-  L --> M{Logged In?}
-  M -->|No| N[Login / Create Account]
-  N --> O{Success?}
-  O -->|No| N
-  O -->|Yes| P[Continue Checkout]
-  M -->|Yes| P[Continue Checkout]
-
-  %% ===== SHIPPING / DELIVERY =====
-  P --> Q{Fulfillment Method?}
-  Q -->|Delivery| R[Enter/Select Address]
-  Q -->|Pickup| S[Choose Pickup Location]
-  R --> T[Select Delivery Window]
-  S --> T[Select Pickup Time Window]
-
-  T --> U{All Items In Stock?}
-  U -->|No| V[Show OOS/Lead Time / Split or Edit Cart] --> F
-  U -->|Yes| W[Reserve Stock TTL]
-
-  %% ===== PAYMENT =====
-  W --> X[Select Payment Method: Card, Wallet, CoD]
-  X --> Y[Create Payment Intent with amount and currency]
-  Y --> Z{3-D Secure / Auth Required?}
-  Z -->|Yes| ZA[Customer Completes Auth]
-  ZA --> ZB{Auth Success?}
-  ZB -->|No| X
-  ZB -->|Yes| ZC[Capture Payment]
-  Z -->|No| ZC[Capture Payment]
-
-  ZC --> ZD{Payment Succeeded?}
-  ZD -->|No| ZE[Release Reservation & Show Error] --> X
-  ZD -->|Yes| ZF[Commit Reservation & Create Order]
-
-  %% ===== POST-PURCHASE =====
-  ZF --> ZG[Generate Order No. & Confirmation]
-  ZG --> ZH[Schedule Delivery/Pickup]
-  ZH --> ZI[Send Confirmation Email/SMS]
-  ZI --> ZJ["Show Thank-You Page (Order No., ETA, Tracking)"]
-
-  %% Notes
-  classDef phase fill:#f7f7f7,stroke:#bbb,color:#111,stroke-width:1;
-  class A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,ZA,ZB,ZC,ZD,ZE,ZF,ZG,ZH,ZI,ZJ phase;
-
-  %% Optional footnote
-  %% *CoD = Cash on Delivery (enable/disable per store policy)
+    %% Simple color styling for readability
+    style A fill:#fde8e8,stroke:#e57373,stroke-width:2px
+    style N fill:#fde8e8,stroke:#e57373,stroke-width:2px
+    style B,C fill:#fff9c4,stroke:#fbc02d,stroke-width:1.5px
+    style D,E fill:#e1f5fe,stroke:#42a5f5,stroke-width:1.5px
+    style F,G,H,I,J fill:#f3e5f5,stroke:#ab47bc,stroke-width:1.5px
+    style K,L,M fill:#e8f5e9,stroke:#66bb6a,stroke-width:1.5px
+    style O fill:#f5f5f5,stroke:#9e9e9e,stroke-width:1.5px
