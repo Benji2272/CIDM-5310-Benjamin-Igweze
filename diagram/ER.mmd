@@ -1,0 +1,67 @@
+erDiagram
+    %% ================= ENTITIES =================
+    CUSTOMER {
+      int id
+      string name
+      string email
+      string phone
+      string preferred_channel
+      datetime created_at
+    }
+    %% preferred_channel: email | sms | push
+    
+    EVENT {
+      int id
+      int customer_id
+      string name                
+      date event_date
+      int remind_days_before     
+      datetime created_at
+    }
+    %% name: Birthday, Anniversary, etc.
+    %% remind_days_before: e.g., 3–5
+
+    REMINDER {
+      int id
+      int event_id
+      string channel             
+      datetime scheduled_at
+      string status              
+      string message_template
+    }
+    %% channel: email | sms | push
+
+    "ORDER" {
+      int id
+      int customer_id
+      int event_id               
+      string status              
+      decimal total_amount
+      datetime created_at
+    }
+    %% status: created | paid | shipped | cancelled
+
+    ORDER_ITEM {
+      int id
+      int order_id
+      int product_id
+      int qty
+      decimal unit_price
+      decimal line_total
+    }
+
+    PRODUCT {
+      int id
+      string name
+      string category
+      decimal price
+      bool is_active
+    }
+
+    %% ================ RELATIONSHIPS ================
+    CUSTOMER ||--o{ EVENT : has
+    EVENT ||--o{ REMINDER : schedules
+    CUSTOMER ||--o{ "ORDER" : places
+    EVENT |o--o{ "ORDER" : may_trigger
+    "ORDER" ||--o{ ORDER_ITEM : contains
+    PRODUCT ||--o{ ORDER_ITEM : listed_in
