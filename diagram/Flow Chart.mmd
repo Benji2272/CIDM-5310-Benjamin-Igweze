@@ -1,14 +1,14 @@
 flowchart TD
     A[Start] --> B[Customer Registers or Logs In]
-    B --> C[Customer Adds Event Dates<br>(Birthday, Anniversary, etc.)]
+    B --> C[Customer Adds Event Dates\n(Birthday, Anniversary, etc.)]
     C --> D[Save Event Details to Database]
-    D --> E[System Scheduler Runs Daily<br>(Cron Job)]
-    E --> F{Any Upcoming Events<br>in 3-5 Days?}
-    F -->|Yes| G[Fetch Customer Details<br>& Event Info]
+    D --> E[System Scheduler Runs Daily\n(Cron Job)]
+    E --> F{Any Upcoming Events\nin 3-5 Days?}
+    F -->|Yes| G[Fetch Customer Details\n& Event Info]
     F -->|No| O[No Action Needed]
-    G --> H[Generate Personalized<br>Reminder Message]
-    H --> I[Send Notification<br>(Email, SMS, or App)]
-    I --> J[Include Order Link<br>or Discount Code]
+    G --> H[Generate Personalized\nReminder Message]
+    H --> I[Send Notification\n(Email, SMS, or App)]
+    I --> J[Include Order Link\nor Discount Code]
     J --> K[Customer Clicks & Places Order]
     K --> L[Order Confirmation Sent]
     L --> M[Record Customer Response Analytics]
