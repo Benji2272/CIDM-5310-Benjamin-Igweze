@@ -1,0 +1,61 @@
+classDiagram
+class Customer {
+  +int id
+  +string name
+  +string email
+  +string phone
+  +string preferredChannel
+  +datetime createdAt
+}
+
+class Event {
+  +int id
+  +int customerId
+  +string name
+  +date eventDate
+  +int remindDaysBefore
+  +datetime createdAt
+}
+
+class Reminder {
+  +int id
+  +int eventId
+  +string channel
+  +datetime scheduledAt
+  +string status
+  +string messageTemplate
+}
+
+class Order {
+  +int id
+  +int customerId
+  +int eventId
+  +string status
+  +decimal totalAmount
+  +datetime createdAt
+}
+
+class OrderItem {
+  +int id
+  +int orderId
+  +int productId
+  +int qty
+  +decimal unitPrice
+  +decimal lineTotal
+}
+
+class Product {
+  +int id
+  +string name
+  +string category
+  +decimal price
+  +bool isActive
+}
+
+Customer --> Event : has
+Event --> Reminder : schedules
+Customer --> Order : places
+Event --> Order : may_trigger
+Order --> OrderItem : contains
+Product --> OrderItem : referenced_by
+
